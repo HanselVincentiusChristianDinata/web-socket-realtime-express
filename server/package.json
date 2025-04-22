@@ -10,7 +10,7 @@
   "keywords": [
     "websocket"
   ],
-  "author": "Rifandi Yusuf",
+  "author": "Razwa",
   "license": "ISC",
   "dependencies": {
     "body-parser": "^2.2.0",

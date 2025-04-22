@@ -21,7 +21,7 @@ const db = require('./models')
 const sequelize = new Sequelize({
     database: 'pi_medsos',
     username: 'root',
-    password: '031107',
+    password: null,
     host: 'localhost',
     dialect: 'mysql'
 }); 
@@ -242,7 +242,7 @@ app.post('/send-notification', (req, res) => {
     res.status(200).json({ message: 'Notifikasi berhasil dikirim' });
 });
 
-app.listen(port, () => {console.log(`Server running at http://${hostName}:${port}`)})
+server.listen(port, () => {console.log(`Server running at http://${hostName}:${port}`)})
 // app.use('/', () => {
 //     routes.get('/student', (req, res) => {
 //         res.status(200).json({

@@ -1,8 +1,8 @@
 {
   "development": {
     "username": "root",
-    "password": "031107",
-    "database": "pi_medsos",
+    "password":  null,
+    "database": "medsos_db",
     "host": "localhost",
     "dialect": "mysql"
   },
