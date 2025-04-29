@@ -13,55 +13,10 @@ const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 const port = 3000
 const hostName = '127.0.0.1'
+const authRoutes = require("./routes/authRoutes")
 
-const {Sequelize} = require('sequelize')
-const { body, param, validationResult } = require('express-validator')
-const db = require('./models')
-
-const sequelize = new Sequelize({
-    database: 'pi_medsos',
-    username: 'root',
-    password: null,
-    host: 'localhost',
-    dialect: 'mysql'
-}); 
-
-(async () => {
-    try {
-        await sequelize.authenticate();
-        console.log('Database connection established successfully.');
-        
-        await sequelize.sync({ alter: true });
-        console.log('Database synchronized successfully.');
-    } catch (error) {
-        console.error('Unable to connect to the database or sync model:', error);
-    }
-})();
-
-
-const Validation = [
-    body('firstName').notEmpty().withMessage('First name is required')
-        .isString().withMessage('First name must be a string'),
-    body('lastName').notEmpty().withMessage('Last name is required')
-        .isString().withMessage('Last name must be a string'),
-    body('classes').notEmpty().withMessage('Class is required')
-        .isIn(['X', 'XI', 'XII']).withMessage('Class must be one of: X, XI, XII'),
-    body('gender').notEmpty().withMessage('Gender is required')
-        .isIn(['M', 'F']).withMessage('Gender must be either M or F'),
-    body('major_id').notEmpty().withMessage('Major ID is required')
-        .isInt({ min: 1 }).withMessage('Major ID must be a positive integer')
-];
-
-const idValidation = param('id').isInt().withMessage('ID must be an integer');
-
-const validate = (req, res, next) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        return res.status(422).json({ errors: errors.array() });
-    }
-    next();
-};
-
+app.use('v1/auth', authRoutes(express));
+app.use('v1/student', studentRoutes(express));
 
 app.get('/', async(req, res) => {
     try {
@@ -92,7 +47,7 @@ app.get('/student', async (req, res) => {
     }
 })
 
-app.post('/addstudent', Validation, validate, async(req, res) => {
+app.post('/addstudent', async(req, res) => {
     try {
         const { firstName, lastName, classes, gender, major_id } = req.body;
         const newStudent = await db.student.create({
@@ -115,7 +70,7 @@ app.post('/addstudent', Validation, validate, async(req, res) => {
     }
 })
 
-app.delete('/student/:id', idValidation, validate, async (req, res) => {
+app.delete('/student/:id', async (req, res) => {
     try {
         const { id } = req.params;
         
@@ -139,7 +94,7 @@ app.delete('/student/:id', idValidation, validate, async (req, res) => {
     }
 })
 
-app.get('/student/:id', idValidation, validate, async (req, res) => {
+app.get('/student/:id', async (req, res) => {
     try {
         const student = await db.student.findByPk(req.params.id);
         
@@ -161,7 +116,7 @@ app.get('/student/:id', idValidation, validate, async (req, res) => {
     }
 });
 
-app.put('/student/:id', [idValidation, ...Validation], validate, async (req, res) => {
+app.put('/student/:id', async (req, res) => {
     try {
         const { id } = req.params;
         const { firstName, lastName, classes, gender, major_id } = req.body;

@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Chat</title>
+    <style>
+        /* Gaya global */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #e5ddd5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .chat-wrapper {
+            display: flex;
+            width: 100%;
+            max-width: 1200px;
+            height: 80vh;
+            background-color: #fff;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        /* Sidebar untuk daftar kontak */
+        .sidebar {
+            width: 35%;
+            background-color: #075e54;
+            color: white;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            transition: width 0.3s ease-in-out;
+        }
+
+        .sidebar:hover {
+            width: 38%;
+        }
+
+        .sidebar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .sidebar-header img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .sidebar-header h2 {
+            font-size: 24px;
+            margin-left: 10px;
+            font-weight: bold;
+        }
+
+        .search-box {
+            margin-top: 20px;
+            display: flex;
+            background-color: #128c7e;
+            padding: 10px;
+            border-radius: 25px;
+            align-items: center;
+        }
+
+        .search-box input {
+            width: 100%;
+            border: none;
+            padding: 10px;
+            border-radius: 25px;
+            font-size: 14px;
+            outline: none;
+            background-color: #ffffff;
+            color: #075e54;
+        }
+
+        .contact-list {
+            margin-top: 30px;
+            flex-grow: 1;
+            overflow-y: auto;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            cursor: pointer;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            transition: background-color 0.3s ease;
+        }
+
+        .contact-item:hover {
+            background-color: #128c7e;
+        }
+
+        .contact-item img {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            margin-right: 15px;
+        }
+
+        .contact-item .contact-name {
+            font-size: 18px;
+            font-weight: bold;
+            color: white;
+        }
+
+        /* Area Chat */
+        .chat-container {
+            width: 65%;
+            display: flex;
+            flex-direction: column;
+            background-color: #f0f0f0;
+            padding: 20px;
+        }
+
+        .chat-header {
+            display: flex;
+            align-items: center;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #ccc;
+        }
+
+        .chat-header img {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .chat-header h2 {
+            margin-left: 15px;
+            font-size: 20px;
+            font-weight: bold;
+            color: #075e54;
+        }
+
+        /* Kotak Pesan */
+        .chat-box {
+            flex-grow: 1;
+            padding: 15px;
+            background-color: #fff;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .message {
+            display: flex;
+            align-items: flex-end;
+        }
+
+        .message.user {
+            justify-content: flex-end;
+        }
+
+        .message .text {
+            max-width: 60%;
+            padding: 12px;
+            border-radius: 18px;
+            font-size: 14px;
+            line-height: 1.4;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .message.user .text {
+            background-color: #dcf8c6;
+            text-align: right;
+        }
+
+        .message.bot .text {
+            background-color: #fff;
+            text-align: left;
+        }
+
+        /* Input area */
+        .input-container {
+            display: flex;
+            padding: 10px;
+            background-color: #fff;
+            border-top: 1px solid #ccc;
+            align-items: center;
+            border-radius: 15px;
+        }
+
+        .input-container input {
+            width: 75%;
+            padding: 12px;
+            border-radius: 25px;
+            border: 1px solid #ccc;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .input-container button {
+            padding: 10px;
+            background-color: #075e54;
+            border: none;
+            border-radius: 50%;
+            color: white;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+
+        .input-container button:hover {
+            background-color: #128c7e;
+        }
+
+        /* Tombol Stiker */
+        .sticker-button {
+            font-size: 20px;
+            margin-right: 10px;
+        }
+
+        /* Desain responsif */
+        @media (max-width: 800px) {
+            .chat-wrapper {
+                flex-direction: column;
+                height: 100%;
+            }
+
+            .sidebar {
+                width: 100%;
+                height: auto;
+                padding: 10px;
+            }
+
+            .contact-list {
+                flex-grow: 1;
+                margin-top: 15px;
+            }
+
+            .chat-container {
+                width: 100%;
+                height: 100%;
+                margin-top: 10px;
+            }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="chat-wrapper">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/WhatsApp_logo.svg/1200px-WhatsApp_logo.svg.png" alt="WhatsApp Logo">
+                <h2>WhatsApp</h2>
+            </div>
+
+            <!-- Search box -->
+            <div class="search-box">
+                <input type="text" placeholder="Cari kontak..." />
+            </div>
+
+            <!-- Daftar Kontak -->
+            <div class="contact-list">
+                <div class="contact-item" onclick="openChat('John Doe', 'john.jpg')">
+                    <img src="https://randomuser.me/api/portraits/men/1.jpg" alt="John">
+                    <div class="contact-name">John Doe</div>
+                </div>
+                <div class="contact-item" onclick="openChat('Jane Smith', 'jane.jpg')">
+                    <img src="https://randomuser.me/api/portraits/women/1.jpg" alt="Jane">
+                    <div class="contact-name">Jane Smith</div>
+                </div>
+                <div class="contact-item" onclick="openChat('Mark Lee', 'mark.jpg')">
+                    <img src="https://randomuser.me/api/portraits/men/2.jpg" alt="Mark">
+                    <div class="contact-name">Mark Lee</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chat Container -->
+        <div class="chat-container">
+            <div class="chat-header">
+                <img src="https://randomuser.me/api/portraits/men/1.jpg" alt="John">
+                <h2 id="chatName">John Doe</h2>
+            </div>
+
+            <div class="chat-box" id="chatBox">
+                <!-- Pesan akan muncul di sini -->
+            </div>
+
+            <!-- Input Area -->
+            <div class="input-container">
+                <button class="sticker-button" onclick="sendSticker()">😊</button>
+                <input type="text" id="userMessage" placeholder="Ketik pesan..." />
+                <button onclick="sendMessage()">Send</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openChat(name, image) {
+            document.getElementById("chatName").innerText = name;
+            const chatHeaderImage = document.querySelector(".chat-header img");
+            chatHeaderImage.src = `https://randomuser.me/api/portraits/men/1.jpg`; // Ganti dengan gambar yang sesuai
+        }
+
+        function sendMessage() {
+            const userMessage = document.getElementById("userMessage").value;
+            if (userMessage.trim() === "") return;
+
+            const userMessageDiv = document.createElement("div");
+            userMessageDiv.classList.add("message", "user");
+
+            const userText = document.createElement("div");
+            userText.classList.add("text");
+            userText.textContent = userMessage;
+
+            userMessageDiv.appendChild(userText);
+            document.getElementById("chatBox").appendChild(userMessageDiv);
+
+            // Scroll ke bagian bawah chat box
+            document.getElementById("chatBox").scrollTop = document.getElementById("chatBox").scrollHeight;
+
+            document.getElementById("userMessage").value = ""; // Bersihkan kolom input
+
+            // Simulasi pesan bot
+            setTimeout(() => {
+                const botMessageDiv = document.createElement("div");
+                botMessageDiv.classList.add("message", "bot");
+
+                const botText = document.createElement("div");
+                botText.classList.add("text");
+                botText.textContent = "Bot: Terima kasih sudah mengirim pesan!";
+
+                botMessageDiv.appendChild(botText);
+                document.getElementById("chatBox").appendChild(botMessageDiv);
+
+                document.getElementById("chatBox").scrollTop = document.getElementById("chatBox").scrollHeight;
+            }, 1000);
+        }
+
+        function sendSticker() {
+            const stickerMessageDiv = document.createElement("div");
+            stickerMessageDiv.classList.add("message", "user");
+
+            const stickerText = document.createElement("div");
+            stickerText.classList.add("text");
+            stickerText.textContent = "😊";  // Stiker emoji
+
+            stickerMessageDiv.appendChild(stickerText);
+            document.getElementById("chatBox").appendChild(stickerMessageDiv);
+
+            document.getElementById("chatBox").scrollTop = document.getElementById("chatBox").scrollHeight;
+        }
+    </script>
+
+    <script>
+        const socket = new WebSocket('ws://127.0.0.1:3002')
+
+        socket.onopen = function(event) {
+            console.log('WebSocket is open now');
+        }
+        socket.onmessage = async (event) => {
+            console.log('d')
+        }
+        socket.onerror = function (event) {
+            console.log('WebSocket ERROR: '+ error);
+        }
+        socket.onclose = function (event) {
+            console.log('WebSocket is closed now.');
+        }
+    </script>
+
+</body>
+</html>
